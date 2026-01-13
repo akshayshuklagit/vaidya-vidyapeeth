@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { UserIcon, PencilIcon, CameraIcon } from "@heroicons/react/24/outline";
-import { useAuth } from "../contexts/authContext";
+import { useAuth } from "../contexts/AuthContext";
 import api from "../utils/api.js";
 
 const Profile = () => {
