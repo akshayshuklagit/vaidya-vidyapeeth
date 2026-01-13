@@ -1,0 +1,25 @@
+# Node
+node_modules/
+
+# Env files (all envs, everywhere)
+.env
+.env.local
+.env.development
+.env.production
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+DEVELOPMENT_PROGRESS.md
+FINAL_VERIFICATION_REPORT.md
+PRODUCTION_DEPLOYMENT_CHECKLIST.md
