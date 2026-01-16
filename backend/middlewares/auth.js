@@ -26,8 +26,9 @@ const authenticate = async (req, res, next) => {
       });
     }
 
-    // 🔐 SESSION VALIDATION
-    if (sessionId && user.sessionId && user.sessionId !== sessionId) {
+    // 🔐 SESSION VALIDATION - Only validate if BOTH exist
+    // Skip validation if user just logged in and hasn't sent sessionId yet
+    if (user.sessionId && sessionId && user.sessionId !== sessionId) {
       return res.status(401).json({
         success: false,
         message: "SESSION_EXPIRED",
