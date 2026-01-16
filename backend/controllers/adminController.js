@@ -1,4 +1,6 @@
 import User from "../models/User.js";
+import Course from "../models/Course.js";
+import Enrollment from "../models/Enrollment.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import mongoose from "mongoose";
 
@@ -150,28 +152,33 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
   const totalStudents = await User.countDocuments({ role: "student" });
   const totalAdmins = await User.countDocuments({ role: "admin" });
   const recentUsers = await User.find().sort({ createdAt: -1 }).limit(5);
+  const totalCourses = await Course.countDocuments();
+  const activeEnrollments = await Enrollment.countDocuments({
+    status: "active",
+  });
+  const totalRevenue = totalStudents * 2500;
 
   const dashboardData = {
     stats: {
       totalUsers,
       totalStudents,
       totalAdmins,
-      totalCourses: 12,
-      totalRevenue: 125000,
-      activeEnrollments: 45,
+      totalCourses,
+      totalRevenue,
+      activeEnrollments,
     },
     recentUsers,
     recentActivity: [
       {
         id: 1,
         action: "New user registered",
-        user: "adi",
+        user: "Akshay",
         time: "2 hours ago",
       },
       {
         id: 2,
-        action: "Course completed",
-        user: "Jane Smith",
+        action: "Course created",
+        user: "Admin",
         time: "4 hours ago",
       },
       {

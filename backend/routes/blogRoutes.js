@@ -6,6 +6,7 @@ import {
   createBlog,
   updateBlog,
   deleteBlog,
+  toggleBlogStatus,
 } from "../controllers/blogController.js";
 import { authenticate, authorize } from "../middlewares/auth.js";
 import { upload } from "../middlewares/multer.js";
@@ -32,6 +33,7 @@ blogRouter.put(
   upload.single("thumbnail"),
   updateBlog
 );
+blogRouter.patch("/admin/:id/status", authenticate, authorize("admin"), toggleBlogStatus);
 blogRouter.delete("/admin/:id", authenticate, authorize("admin"), deleteBlog);
 
 export default blogRouter;

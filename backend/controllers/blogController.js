@@ -6,7 +6,7 @@ import cloudinary from "../config/cloudinary.js";
 // @route   GET /api/blogs
 // @access  Public
 const getBlogs = asyncHandler(async (req, res) => {
-  const { category, search } = req.query;
+  const { category, search, limit } = req.query;
   const filter = { status: "published" };
 
   if (category) filter.category = category;
@@ -17,11 +17,17 @@ const getBlogs = asyncHandler(async (req, res) => {
     ];
   }
 
-  const blogs = await Blog.find(filter).sort({ publishedAt: -1 });
+  let query = Blog.find(filter).sort({ publishedAt: -1 });
+
+  if (limit) {
+    query = query.limit(parseInt(limit));
+  }
+
+  const blogs = await query;
 
   res.status(200).json({
     success: true,
-    data: blogs,
+    blogs,
   });
 });
 
@@ -29,7 +35,10 @@ const getBlogs = asyncHandler(async (req, res) => {
 // @route   GET /api/blogs/:slug
 // @access  Public
 const getBlogBySlug = asyncHandler(async (req, res) => {
-  const blog = await Blog.findOne({ slug: req.params.slug, status: "published" });
+  const blog = await Blog.findOne({
+    slug: req.params.slug,
+    status: "published",
+  });
 
   if (!blog) {
     return res.status(404).json({
@@ -70,7 +79,15 @@ const createBlog = asyncHandler(async (req, res) => {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
-  const readTime = Math.ceil(content.split(" ").length / 200);
+  // Strip HTML tags and calculate read time
+  const plainText = content
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const wordCount = plainText
+    .split(" ")
+    .filter((word) => word.length > 0).length;
+  const readTime = Math.max(1, Math.ceil(wordCount / 200));
 
   const blogData = {
     title,
@@ -133,7 +150,14 @@ const updateBlog = asyncHandler(async (req, res) => {
   if (excerpt) blog.excerpt = excerpt;
   if (content) {
     blog.content = content;
-    blog.readTime = Math.ceil(content.split(" ").length / 200);
+    const plainText = content
+      .replace(/<[^>]*>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    const wordCount = plainText
+      .split(" ")
+      .filter((word) => word.length > 0).length;
+    blog.readTime = Math.max(1, Math.ceil(wordCount / 200));
   }
   if (category) blog.category = category;
   if (tags) blog.tags = JSON.parse(tags);
@@ -188,6 +212,33 @@ const deleteBlog = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Toggle blog status (draft/published)
+// @route   PATCH /api/admin/blogs/:id/status
+// @access  Private (Admin)
+const toggleBlogStatus = asyncHandler(async (req, res) => {
+  const blog = await Blog.findById(req.params.id);
+
+  if (!blog) {
+    return res.status(404).json({
+      success: false,
+      error: "Blog not found",
+    });
+  }
+
+  blog.status = blog.status === "published" ? "draft" : "published";
+
+  if (blog.status === "published" && !blog.publishedAt) {
+    blog.publishedAt = new Date();
+  }
+
+  await blog.save();
+
+  res.status(200).json({
+    success: true,
+    data: blog,
+  });
+});
+
 export {
   getBlogs,
   getBlogBySlug,
@@ -195,4 +246,5 @@ export {
   createBlog,
   updateBlog,
   deleteBlog,
+  toggleBlogStatus,
 };

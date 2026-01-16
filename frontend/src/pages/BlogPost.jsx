@@ -18,14 +18,20 @@ const BlogPost = () => {
   const { slug } = useParams();
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchBlog = async () => {
       try {
         const res = await api.get(`/blogs/${slug}`);
-        setBlog(res.data.data);
+        setBlog(res.data.data || res.data.blog || null);
       } catch (error) {
-        console.error("Failed to fetch blog", error);
+        console.error(
+          "Failed to fetch blog:",
+          error.response?.data || error.message
+        );
+        setError(error.response?.data?.error || "Blog not found");
+        setBlog(null);
       } finally {
         setLoading(false);
       }
@@ -34,7 +40,23 @@ const BlogPost = () => {
   }, [slug]);
 
   if (loading) return <FullScreenLoader />;
-  if (!blog) return <div className="text-center p-8 pt-24">Blog not found</div>;
+  if (!blog)
+    return (
+      <div className="min-h-screen pt-24 flex flex-col items-center justify-center">
+        <div className="text-center p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Blog not found
+          </h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <Link
+            to="/blog"
+            className="text-blue-600 hover:text-blue-700 font-medium"
+          >
+            ← Back to Blog
+          </Link>
+        </div>
+      </div>
+    );
 
   const blogPost = blog;
 
@@ -45,7 +67,7 @@ const BlogPost = () => {
       <div className="absolute bottom-0 left-0 w-40 sm:w-80 h-40 sm:h-80 bg-gradient-to-tr from-indigo-200 to-transparent rounded-full blur-3xl opacity-20 -z-10"></div>
 
       {/* Back Button */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 mt-4 sm:mt-8">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -109,7 +131,9 @@ const BlogPost = () => {
             <div className="flex items-center gap-2 bg-white px-3 sm:px-4 py-2 rounded-full shadow-md text-sm sm:text-base">
               <CalendarDaysIcon className="w-4 sm:w-5 h-4 sm:h-5 text-blue-600" />
               <span className="font-medium text-xs sm:text-sm">
-                {new Date(blogPost.publishedAt || blogPost.createdAt).toLocaleDateString()}
+                {new Date(
+                  blogPost.publishedAt || blogPost.createdAt
+                ).toLocaleDateString()}
               </span>
             </div>
             <div className="flex items-center gap-2 bg-white px-3 sm:px-4 py-2 rounded-full shadow-md text-sm sm:text-base">
@@ -131,6 +155,20 @@ const BlogPost = () => {
               size="sm"
               icon={ShareIcon}
               className="text-blue-700 hover:bg-blue-100"
+              onClick={() => {
+                if (navigator.share) {
+                  navigator
+                    .share({
+                      title: blogPost.title,
+                      text: blogPost.excerpt,
+                      url: window.location.href,
+                    })
+                    .catch(() => {});
+                } else {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert("Link copied to clipboard!");
+                }
+              }}
             >
               Share
             </Button>
@@ -153,7 +191,9 @@ const BlogPost = () => {
           transition={{ delay: 0.2 }}
         >
           <img
-            src={blogPost.thumbnail?.url || 'https://via.placeholder.com/800x400'}
+            src={
+              blogPost.thumbnail?.url || "https://via.placeholder.com/800x400"
+            }
             alt={blogPost.title}
             className="w-full h-full object-cover"
           />
@@ -167,7 +207,10 @@ const BlogPost = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <div className="text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: blogPost.content }} />
+          <div
+            className="text-gray-700 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: blogPost.content }}
+          />
         </motion.div>
 
         {/* Tags */}
@@ -190,46 +233,6 @@ const BlogPost = () => {
             </motion.span>
           ))}
         </motion.div>
-
-        {/* Author Bio */}
-        <motion.div
-          className="relative bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl sm:rounded-3xl p-4 sm:p-8 mb-8 sm:mb-12 border-2 border-blue-200 shadow-lg overflow-hidden"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          <div className="absolute top-0 right-0 w-32 sm:w-40 h-32 sm:h-40 bg-gradient-to-br from-indigo-200 to-transparent rounded-full opacity-30 -z-10"></div>
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-            <motion.div
-              className="w-16 sm:w-20 h-16 sm:h-20 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-xl sm:text-2xl shadow-lg flex-shrink-0"
-              whileHover={{ scale: 1.1 }}
-            >
-              {blogPost.author.name.charAt(0)}
-            </motion.div>
-            <div className="text-center sm:text-left">
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
-                {blogPost.author.name}
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                Ayurveda Expert
-              </p>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Key Takeaways Box - Removed */}
-
-        {/* Related Posts */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-        >
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3">
-            <span className="w-0.5 h-8 sm:h-10 bg-gradient-to-b from-blue-500 to-indigo-500 rounded-full"></span>
-            Related Articles
-          </h2>
-        </motion.section>
       </article>
     </div>
   );

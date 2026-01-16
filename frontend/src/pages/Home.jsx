@@ -89,7 +89,8 @@ const Home = () => {
     const fetchBlogs = async () => {
       try {
         const response = await api.get('/blogs?limit=3');
-        setBlogs(response.data.blogs || []);
+        const fetchedBlogs = response.data.blogs || response.data.data || [];
+        setBlogs(fetchedBlogs);
       } catch (error) {
         console.error('Failed to fetch blogs:', error);
       } finally {

@@ -17,7 +17,8 @@ const Blog = () => {
     const fetchBlogs = async () => {
       try {
         const res = await api.get("/blogs");
-        setBlogs(res.data.data);
+        const fetchedBlogs = res.data.blogs || res.data.data || [];
+        setBlogs(fetchedBlogs);
       } catch (error) {
         console.error("Failed to fetch blogs", error);
       } finally {
@@ -72,7 +73,7 @@ const Blog = () => {
         >
           {blogs.map((post, index) => (
             <motion.article
-              key={post.id}
+              key={post._id || post.id || index}
               layout
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}

@@ -44,22 +44,13 @@ const Profile = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
-      const res = await api.put(
-        "/users/profile",
-        {
-          name: profile.name,
-          phone: profile.phone,
-          dateOfBirth: profile.dateOfBirth,
-          profile: { bio: profile.bio },
-          address: profile.address,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${auth.token}`,
-            "x-skip-auth-logout": "true", // 🔥 IMPORTANT
-          },
-        }
-      );
+      const res = await api.put("/users/profile", {
+        name: profile.name,
+        phone: profile.phone,
+        dateOfBirth: profile.dateOfBirth,
+        profile: { bio: profile.bio },
+        address: profile.address,
+      });
 
       updateUser(res.data.data.user);
       setIsEditing(false);

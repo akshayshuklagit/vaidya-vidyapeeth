@@ -73,7 +73,7 @@ function App() {
               <Route path="/course-player/:id" element={<CoursePlayer />} />
 
               <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:id" element={<BlogPost />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/about" element={<About />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
