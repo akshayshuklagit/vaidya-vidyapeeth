@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import heroIllustration from "../assets/undraw_stepping-up_i0i7.svg";
 import CountUp from "../components/CountUp";
 import Slider from "../components/Slider";
-import { blogPosts } from "../data/blogData";
+import api from "../utils/api";
 
 import {
   SparklesIcon,
@@ -81,7 +81,23 @@ const Home = () => {
   const { t } = useLanguage();
   const { auth } = useAuth();
   const { courses, loading } = useCourses();
+  const [blogs, setBlogs] = useState([]);
+  const [blogsLoading, setBlogsLoading] = useState(true);
   const dashboardRoute = auth?.user?.role === "admin" ? "/admin" : "/dashboard";
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const response = await api.get('/blogs?limit=3');
+        setBlogs(response.data.blogs || []);
+      } catch (error) {
+        console.error('Failed to fetch blogs:', error);
+      } finally {
+        setBlogsLoading(false);
+      }
+    };
+    fetchBlogs();
+  }, []);
 
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
@@ -354,61 +370,89 @@ const Home = () => {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {blogPosts.map((post, index) => (
-              <motion.article
-                key={post.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group"
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                      {post.category}
-                    </span>
+            {blogsLoading ? (
+              [...Array(3)].map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse"
+                >
+                  <div className="h-48 bg-gray-200"></div>
+                  <div className="p-6">
+                    <div className="h-4 bg-gray-200 rounded mb-3"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                   </div>
                 </div>
+              ))
+            ) : blogs.length > 0 ? (
+              blogs.map((post, index) => (
+                <motion.article
+                  key={post._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group"
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={post.thumbnail?.url || '/placeholder-blog.jpg'}
+                      alt={post.title}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        {post.category}
+                      </span>
+                    </div>
+                  </div>
 
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
-                    {post.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    {post.excerpt}
-                  </p>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
+                      {post.title}
+                    </h3>
+                    <p className="text-gray-600 mb-4 line-clamp-3">
+                      {post.excerpt}
+                    </p>
 
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-medium text-xs">
-                        {post.author
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <div className="flex items-center space-x-2">
+                        {post.author?.avatar ? (
+                          <img
+                            src={post.author.avatar}
+                            alt={post.author.name}
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-medium text-xs">
+                            {post.author?.name
+                              ?.split(" ")
+                              .map((n) => n[0])
+                              .join("") || "A"}
+                          </div>
+                        )}
+                        <span>{post.author?.name || 'Anonymous'}</span>
                       </div>
-                      <span>{post.author}</span>
+                      <div className="flex items-center space-x-4">
+                        <span>{new Date(post.publishedAt || post.createdAt).toLocaleDateString()}</span>
+                        <span>•</span>
+                        <span>{post.readTime} min read</span>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <span>{post.date}</span>
-                      <span>•</span>
-                      <span>{post.readTime}</span>
-                    </div>
-                  </div>
 
-                  <Link
-                    to={`/blog/${post.id}`}
-                    className="inline-flex items-center mt-4 text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                  >
-                    Read More →
-                  </Link>
-                </div>
-              </motion.article>
-            ))}
+                    <Link
+                      to={`/blog/${post.slug}`}
+                      className="inline-flex items-center mt-4 text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                    >
+                      Read More →
+                    </Link>
+                  </div>
+                </motion.article>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-12 text-gray-500">
+                No blog posts available yet.
+              </div>
+            )}
           </div>
 
           <motion.div className="text-center mt-12" {...fadeInUp}>
