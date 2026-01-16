@@ -315,7 +315,7 @@ function AuthForm({ title, subtitle, button, showName = false }) {
         login({
           token: idToken,
           user: userData,
-          sessionId: sessionId, // 🔥 IMPORTANT: Store sessionId
+          sessionId: sessionId,
         });
       } catch {
         userData = {
@@ -330,7 +330,6 @@ function AuthForm({ title, subtitle, button, showName = false }) {
           user: userData,
         });
       }
-      resyncUser();
     } catch (err) {
       setError(err.message || "Google login failed");
     } finally {
