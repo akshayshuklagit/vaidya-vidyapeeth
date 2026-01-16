@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
+import mongoose from "mongoose";
 
 // @desc    Get all users
 // @route   GET /api/admin/users
@@ -35,6 +36,13 @@ const getAllUsers = asyncHandler(async (req, res) => {
 // @route   GET /api/admin/users/:id
 // @access  Private (Admin only)
 const getUserById = asyncHandler(async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({
+      success: false,
+      error: "Invalid user ID",
+    });
+  }
+
   const user = await User.findById(req.params.id);
 
   if (!user) {
@@ -76,6 +84,17 @@ const updateUser = asyncHandler(async (req, res) => {
 // @route   DELETE /api/admin/users/:id
 // @access  Private (Admin only)
 const deleteUser = asyncHandler(async (req, res) => {
+  if (
+    !req.params.id ||
+    req.params.id === "null" ||
+    req.params.id === "undefined"
+  ) {
+    return res.status(400).json({
+      success: false,
+      error: "Invalid user ID",
+    });
+  }
+
   const user = await User.findByIdAndDelete(req.params.id);
 
   if (!user) {
@@ -191,7 +210,7 @@ const enrollUserInCourse = asyncHandler(async (req, res) => {
   if (!userId || !courseId) {
     return res.status(400).json({
       success: false,
-      error: 'User ID and Course ID are required'
+      error: "User ID and Course ID are required",
     });
   }
 
@@ -200,27 +219,27 @@ const enrollUserInCourse = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(404).json({
       success: false,
-      error: 'User not found'
+      error: "User not found",
     });
   }
 
   // Check if course exists
-  const Course = (await import('../models/Course.js')).default;
+  const Course = (await import("../models/Course.js")).default;
   const course = await Course.findById(courseId);
   if (!course) {
     return res.status(404).json({
       success: false,
-      error: 'Course not found'
+      error: "Course not found",
     });
   }
 
   // Check if already enrolled
-  const Enrollment = (await import('../models/Enrollment.js')).default;
+  const Enrollment = (await import("../models/Enrollment.js")).default;
   const existingEnrollment = await Enrollment.findOne({ userId, courseId });
   if (existingEnrollment) {
     return res.status(400).json({
       success: false,
-      error: 'User already enrolled in this course'
+      error: "User already enrolled in this course",
     });
   }
 
@@ -229,22 +248,22 @@ const enrollUserInCourse = asyncHandler(async (req, res) => {
     userId,
     courseId,
     enrollmentDate: new Date(),
-    status: 'active',
+    status: "active",
     progress: {
       completedLessons: 0,
       totalLessons: course.resources?.length || 0,
       percentage: 0,
-      timeSpent: 0
+      timeSpent: 0,
     },
-    paymentId: 'ADMIN_ENROLLED' // Mark as admin enrolled
+    paymentId: "ADMIN_ENROLLED", // Mark as admin enrolled
   });
 
   await enrollment.save();
-  
+
   res.status(201).json({
     success: true,
-    message: 'User enrolled successfully',
-    data: enrollment
+    message: "User enrolled successfully",
+    data: enrollment,
   });
 });
 

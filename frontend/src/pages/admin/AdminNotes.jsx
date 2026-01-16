@@ -12,44 +12,29 @@ import AddNoteForm from "../../components/forms/AddNoteForm";
 
 const AdminNotes = () => {
   const [showAddNoteModal, setShowAddNoteModal] = useState(false);
-  const resources = [
-    {
-      id: 1,
-      title: "Ayurveda Fundamentals Guide",
-      course: "Fundamentals of Ayurveda",
-      type: "PDF",
-      size: "2.5 MB",
-      uploaded: "Dec 1, 2024",
-      downloads: 156,
-    },
-    {
-      id: 2,
-      title: "Panchakarma Manual",
-      course: "Panchakarma Therapy",
-      type: "PDF",
-      size: "4.2 MB",
-      uploaded: "Nov 28, 2024",
-      downloads: 89,
-    },
-    {
-      id: 3,
-      title: "Herbal Reference Chart",
-      course: "Herbal Medicine",
-      type: "PDF",
-      size: "1.8 MB",
-      uploaded: "Nov 25, 2024",
-      downloads: 234,
-    },
-    {
-      id: 4,
-      title: "Dosha Assessment Sheet",
-      course: "Fundamentals of Ayurveda",
-      type: "PDF",
-      size: "0.8 MB",
-      uploaded: "Nov 20, 2024",
-      downloads: 178,
-    },
-  ];
+  const resources = [];
+  const NOTES_ENABLED = false;
+
+  if (!NOTES_ENABLED) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+        <span className="text-6xl">📝</span>
+        <h2 className="text-2xl font-semibold text-gray-900">
+          Notes module not enabled yet
+        </h2>
+        <p className="text-gray-600 max-w-md">
+          Notes management features will be available Later
+        </p>
+
+        <button
+          disabled
+          className="mt-4 bg-gray-300 text-gray-600 px-6 py-2 rounded-lg cursor-not-allowed"
+        >
+          Upload New Notes
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -61,7 +46,7 @@ const AdminNotes = () => {
           </h2>
           <p className="text-gray-600">Upload and manage course materials</p>
         </div>
-        <button 
+        <button
           onClick={() => setShowAddNoteModal(true)}
           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center space-x-2"
         >
@@ -258,7 +243,7 @@ const AdminNotes = () => {
       >
         <AddNoteForm
           onSubmit={(noteData) => {
-            console.log('New note:', noteData);
+            console.log("New note:", noteData);
             setShowAddNoteModal(false);
           }}
           onCancel={() => setShowAddNoteModal(false)}

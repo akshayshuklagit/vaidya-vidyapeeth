@@ -56,6 +56,7 @@ const Profile = () => {
         {
           headers: {
             Authorization: `Bearer ${auth.token}`,
+            "x-skip-auth-logout": "true", // 🔥 IMPORTANT
           },
         }
       );
@@ -113,7 +114,6 @@ const Profile = () => {
                 <h2 className="text-xl font-semibold text-gray-900">
                   {profile.name}
                 </h2>
-                <p className="text-gray-600">{auth.user.email}</p>
               </div>
             </div>
 

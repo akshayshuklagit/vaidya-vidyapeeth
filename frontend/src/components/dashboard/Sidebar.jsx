@@ -33,12 +33,12 @@ const studentMenuItems = [
 const adminMenuItems = [
   { name: "Dashboard", href: "/admin", icon: HomeIcon },
   { name: "Courses", href: "/admin/courses", icon: BookOpenIcon },
-  { name: "Notes / Resources", href: "/admin/notes", icon: DocumentTextIcon },
-  { name: "Payments", href: "/admin/payments", icon: CreditCardIcon },
   { name: "Meeting manager", href: "/admin/meetings", icon: CreditCardIcon },
   { name: "Users", href: "/admin/users", icon: UsersIcon },
-  { name: "Blogs", href: "/admin/blogs", icon: PencilSquareIcon },
   { name: "Notifications", href: "/admin/notifications", icon: BellIcon },
+  { name: "Blogs", href: "/admin/blogs", icon: PencilSquareIcon },
+  { name: "Payments", href: "/admin/payments", icon: CreditCardIcon },
+  { name: "Notes / Resources", href: "/admin/notes", icon: DocumentTextIcon },
   { name: "Settings", href: "/admin/settings", icon: CogIcon },
 ];
 

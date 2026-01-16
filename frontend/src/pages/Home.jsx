@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import heroIllustration from "../assets/undraw_stepping-up_i0i7.svg";
 import CountUp from "../components/CountUp";
 import Slider from "../components/Slider";
+import { blogPosts } from "../data/blogData";
 
 import {
   SparklesIcon,
@@ -353,44 +354,7 @@ const Home = () => {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                id: 1,
-                title: "Understanding Your Dosha: A Complete Guide",
-                excerpt:
-                  "Learn how to identify your unique body constitution and live in harmony with your natural tendencies.",
-                author: "Dr. Priya Sharma",
-                date: "Dec 15, 2024",
-                readTime: "5 min read",
-                category: "Fundamentals",
-                image:
-                  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop",
-              },
-              {
-                id: 2,
-                title: "10 Ayurvedic Herbs for Daily Wellness",
-                excerpt:
-                  "Discover powerful herbs that can transform your health when incorporated into your daily routine.",
-                author: "Vaidya Rajesh Kumar",
-                date: "Dec 12, 2024",
-                readTime: "7 min read",
-                category: "Herbs",
-                image:
-                  "https://images.unsplash.com/photo-1471193945509-9ad0617afabf?w=400&h=250&fit=crop",
-              },
-              {
-                id: 3,
-                title: "Seasonal Eating According to Ayurveda",
-                excerpt:
-                  "Align your diet with nature's rhythms for optimal health and vitality throughout the year.",
-                author: "Dr. Kavita Patel",
-                date: "Dec 10, 2024",
-                readTime: "6 min read",
-                category: "Nutrition",
-                image:
-                  "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=250&fit=crop",
-              },
-            ].map((post, index) => (
+            {blogPosts.map((post, index) => (
               <motion.article
                 key={post.id}
                 initial={{ opacity: 0, y: 20 }}

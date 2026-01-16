@@ -5,58 +5,8 @@ import {
 } from "@heroicons/react/24/outline";
 
 const AdminPayments = () => {
-  const payments = [
-    {
-      id: 1,
-      user: "John Doe",
-      course: "Fundamentals of Ayurveda",
-      amount: "₹2,999",
-      date: "Dec 14, 2024",
-      method: "Credit Card",
-      status: "Completed",
-      transactionId: "TXN123456789",
-    },
-    {
-      id: 2,
-      user: "Sarah Wilson",
-      course: "Panchakarma Therapy",
-      amount: "₹4,999",
-      date: "Dec 14, 2024",
-      method: "UPI",
-      status: "Completed",
-      transactionId: "TXN987654321",
-    },
-    {
-      id: 3,
-      user: "Mike Johnson",
-      course: "Herbal Medicine",
-      amount: "₹1,999",
-      date: "Dec 13, 2024",
-      method: "Net Banking",
-      status: "Completed",
-      transactionId: "TXN456789123",
-    },
-    {
-      id: 4,
-      user: "Lisa Brown",
-      course: "Advanced Ayurveda",
-      amount: "₹6,999",
-      date: "Dec 13, 2024",
-      method: "Credit Card",
-      status: "Pending",
-      transactionId: "TXN789123456",
-    },
-    {
-      id: 5,
-      user: "David Lee",
-      course: "Yoga & Meditation",
-      amount: "₹3,499",
-      date: "Dec 12, 2024",
-      method: "UPI",
-      status: "Failed",
-      transactionId: "TXN321654987",
-    },
-  ];
+  const PAYMENTS_ENABLED = false; // turn true later
+  const payments = [];
 
   const totalRevenue = payments
     .filter((p) => p.status === "Completed")
@@ -64,6 +14,21 @@ const AdminPayments = () => {
       (sum, p) => sum + parseInt(p.amount.replace("₹", "").replace(",", "")),
       0
     );
+
+  if (!PAYMENTS_ENABLED) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+        <span className="text-6xl">📝</span>
+        <h2 className="text-2xl font-semibold text-gray-900">
+          Payment module not enabled yet
+        </h2>
+        <p className="text-gray-600 max-w-md">
+          Payment management features will be available once the registration
+          system is activated through Website.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

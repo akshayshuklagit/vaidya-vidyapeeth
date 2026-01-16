@@ -9,6 +9,17 @@ import { useState, useEffect } from "react";
 import api from "../../utils/api";
 import { toast } from "sonner";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+import { Button } from "@/components/ui/button";
+
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -169,126 +180,111 @@ const AdminUsers = () => {
           <h3 className="text-lg font-semibold text-gray-900">All Users</h3>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="text-left py-3 px-6 font-medium text-gray-600">
-                  User
-                </th>
-                <th className="text-left py-3 px-6 font-medium text-gray-600">
-                  Role
-                </th>
-                <th className="text-left py-3 px-6 font-medium text-gray-600">
-                  Status
-                </th>
-                <th className="text-left py-3 px-6 font-medium text-gray-600">
-                  Courses
-                </th>
-                <th className="text-left py-3 px-6 font-medium text-gray-600">
-                  Joined
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>User</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Courses</TableHead>
+                <TableHead>Joined</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
               {users.map((user) => (
-                <tr
-                  key={user._id}
-                  className="border-b border-gray-100 hover:bg-gray-50"
-                >
-                  <td className="py-4 px-6">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full flex items-center justify-center">
-                        <span className="text-white text-sm font-medium">
-                          {user.name.charAt(0).toUpperCase()}
-                        </span>
+                <TableRow key={user._id}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-semibold">
+                        {user.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">{user.name}</p>
-                        <p className="text-sm text-gray-500">{user.email}</p>
+                        <p className="font-medium">{user.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {user.email}
+                        </p>
                       </div>
                     </div>
-                  </td>
-                  <td className="py-4 px-6">
+                  </TableCell>
+
+                  <TableCell>
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
                         user.role === "admin"
-                          ? "bg-red-100 text-red-800"
-                          : "bg-blue-100 text-blue-800"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-blue-100 text-blue-700"
                       }`}
                     >
                       {user.role}
                     </span>
-                  </td>
-                  <td className="py-4 px-6">
+                  </TableCell>
+
+                  <TableCell>
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
                         user.isActive
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-gray-200 text-gray-700"
                       }`}
                     >
                       {user.isActive ? "Active" : "Inactive"}
                     </span>
-                  </td>
-                  <td className="py-4 px-6 text-gray-600">-</td>
-                  <td className="py-4 px-6 text-gray-600">
-                    {new Date(user.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setShowEnrollModal(true);
-                        }}
-                        className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors flex items-center gap-1"
-                      >
-                        <GiftIcon className="w-3 h-3" />
-                        Free Enroll
-                      </button>
+                  </TableCell>
 
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <button
-                            onClick={() => setDeleteUserId(user._id)}
-                            className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                  <TableCell>-</TableCell>
+
+                  <TableCell>
+                    {new Date(user.createdAt).toLocaleDateString()}
+                  </TableCell>
+
+                  <TableCell className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        setSelectedUser(user);
+                        setShowEnrollModal(true);
+                      }}
+                    >
+                      Free Enroll
+                    </Button>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          size="sm" 
+                          variant="destructive"
+                          onClick={() => setDeleteUserId(user._id)}
+                        >
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete User?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter>
+                          <AlertDialogCancel onClick={() => setDeleteUserId(null)}>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleConfirmDelete}
                           >
                             Delete
-                          </button>
-                        </AlertDialogTrigger>
-
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete User?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. User{" "}
-                              <strong>{user.name}</strong> will be permanently
-                              removed.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-
-                          <AlertDialogFooter>
-                            <AlertDialogCancel
-                              onClick={() => setDeleteUserId(null)}
-                            >
-                              Cancel
-                            </AlertDialogCancel>
-
-                            <AlertDialogAction
-                              onClick={handleConfirmDelete}
-                              className="bg-red-600 hover:bg-red-700"
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </td>
-                </tr>
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
 

@@ -212,7 +212,7 @@ const Navbar = () => {
                   key={item.name}
                   to={item.href}
                   onClick={() => setIsOpen(false)}
-                  className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${
+                  className={`block px-4 py-5 rounded-lg text-base font-medium transition-colors ${
                     isActive(item.href)
                       ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600"
                       : "text-gray-700 hover:bg-gray-50"
@@ -235,19 +235,7 @@ const Navbar = () => {
 
                 {isLoggedIn ? (
                   <>
-                    <Link
-                      to="/notifications"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center space-x-2 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      <BellIcon className="w-5 h-5" />
-                      <span>Notifications</span>
-                      {notificationCount > 0 && (
-                        <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                          {notificationCount}
-                        </span>
-                      )}
-                    </Link>
+                    <NotificationDropdown />
                     <Link
                       to="/profile"
                       onClick={() => setIsOpen(false)}

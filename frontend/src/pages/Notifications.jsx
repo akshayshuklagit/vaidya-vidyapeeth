@@ -1,68 +1,26 @@
-import { useState } from "react";
 import { BellIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useNotifications } from "../contexts/NotificationContext";
+import { formatDistanceToNow } from "date-fns";
 
 const Notifications = () => {
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      title: "Course Enrollment Confirmed",
-      message: "You have successfully enrolled in Fundamentals of Ayurveda",
-      type: "success",
-      time: "2 hours ago",
-      isRead: false,
-    },
-    {
-      id: 2,
-      title: "New Resource Available",
-      message: "Herbal Medicine Guide has been uploaded to your course",
-      type: "info",
-      time: "1 day ago",
-      isRead: false,
-    },
-    {
-      id: 3,
-      title: "Payment Successful",
-      message: "Your payment of ₹2,999 has been processed successfully",
-      type: "success",
-      time: "2 days ago",
-      isRead: true,
-    },
-    {
-      id: 4,
-      title: "Course Reminder",
-      message: "Don't forget to complete Module 3 of Panchakarma Therapy",
-      type: "warning",
-      time: "3 days ago",
-      isRead: true,
-    },
-  ]);
-
-  const markAsRead = (id) => {
-    setNotifications((prev) =>
-      prev.map((notif) =>
-        notif.id === id ? { ...notif, isRead: true } : notif
-      )
-    );
-  };
-
-  const deleteNotification = (id) => {
-    setNotifications((prev) => prev.filter((notif) => notif.id !== id));
-  };
-
-  const markAllAsRead = () => {
-    setNotifications((prev) =>
-      prev.map((notif) => ({ ...notif, isRead: true }))
-    );
-  };
+  const {
+    notifications,
+    loading,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+  } = useNotifications();
 
   const getTypeColor = (type) => {
     switch (type) {
-      case "success":
+      case "course":
+        return "bg-blue-100 text-blue-800";
+      case "payment":
         return "bg-green-100 text-green-800";
-      case "warning":
-        return "bg-yellow-100 text-yellow-800";
-      case "error":
-        return "bg-red-100 text-red-800";
+      case "system":
+        return "bg-gray-100 text-gray-800";
+      case "announcement":
+        return "bg-purple-100 text-purple-800";
       default:
         return "bg-blue-100 text-blue-800";
     }
@@ -70,88 +28,87 @@ const Notifications = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 mt-17">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           {/* Header */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <BellIcon className="w-6 h-6 text-blue-600" />
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Notifications
-                </h1>
-              </div>
+          <div className="p-6 border-b border-gray-200 flex justify-between">
+            <div className="flex items-center gap-3">
+              <BellIcon className="w-6 h-6 text-blue-600" />
+              <h1 className="text-2xl font-bold">Notifications</h1>
+            </div>
+
+            {notifications.length > 0 && (
               <button
                 onClick={markAllAsRead}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="text-blue-600 hover:text-blue-700 text-sm"
               >
                 Mark all as read
               </button>
-            </div>
+            )}
           </div>
 
-          {/* Notifications List */}
-          <div className="divide-y divide-gray-200">
-            {notifications.length === 0 ? (
-              <div className="p-8 text-center">
-                <BellIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">No notifications yet</p>
-              </div>
-            ) : (
-              notifications.map((notification) => (
+          {/* Body */}
+          {loading ? (
+            <div className="p-8 text-center text-gray-500">Loading...</div>
+          ) : notifications.length === 0 ? (
+            <div className="p-8 text-center">
+              <BellIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-500">No notifications yet</p>
+            </div>
+          ) : (
+            <div className="divide-y">
+              {notifications.map((n) => (
                 <div
-                  key={notification.id}
-                  className={`p-6 hover:bg-gray-50 transition-colors ${
-                    !notification.isRead ? "bg-blue-50" : ""
+                  key={n._id}
+                  className={`p-6 hover:bg-gray-50 ${
+                    !n.isRead ? "bg-blue-50" : ""
                   }`}
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <h3 className="font-semibold text-gray-900">
-                          {notification.title}
-                        </h3>
-                        {!notification.isRead && (
-                          <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold">{n.title}</h3>
+                        {!n.isRead && (
+                          <span className="w-2 h-2 bg-blue-600 rounded-full" />
                         )}
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(
-                            notification.type
+                          className={`px-2 py-1 rounded-full text-xs ${getTypeColor(
+                            n.category
                           )}`}
                         >
-                          {notification.type}
+                          {n.category}
                         </span>
                       </div>
-                      <p className="text-gray-600 mb-2">
-                        {notification.message}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {notification.time}
+
+                      <p className="text-gray-600 mb-1">{n.message}</p>
+                      <p className="text-xs text-gray-500">
+                        {formatDistanceToNow(new Date(n.createdAt), {
+                          addSuffix: true,
+                        })}
                       </p>
                     </div>
-                    <div className="flex items-center space-x-2 ml-4">
-                      {!notification.isRead && (
+
+                    <div className="flex items-center gap-2">
+                      {!n.isRead && (
                         <button
-                          onClick={() => markAsRead(notification.id)}
+                          onClick={() => markAsRead(n._id)}
                           className="p-1 text-green-600 hover:bg-green-50 rounded"
-                          title="Mark as read"
                         >
                           <CheckIcon className="w-4 h-4" />
                         </button>
                       )}
                       <button
-                        onClick={() => deleteNotification(notification.id)}
+                        onClick={() => deleteNotification(n._id)}
                         className="p-1 text-red-600 hover:bg-red-50 rounded"
-                        title="Delete"
                       >
                         <XMarkIcon className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

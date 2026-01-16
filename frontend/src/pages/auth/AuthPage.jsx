@@ -257,10 +257,17 @@ function AuthForm({ title, subtitle, button, showName = false }) {
           name: form.name,
         });
         userFromBackend = res?.data?.data?.user || res?.data?.user;
+        const sessionId = res?.data?.data?.sessionId;
 
         if (!userFromBackend) {
           throw new Error("User data missing from backend");
         }
+
+        login({
+          token: idToken,
+          user: userFromBackend,
+          sessionId: sessionId, // 🔥 IMPORTANT: Store sessionId
+        });
       } catch (syncErr) {
         // If backend sync is disabled or fails, fall back to using Firebase user info
         console.warn(
@@ -273,12 +280,12 @@ function AuthForm({ title, subtitle, button, showName = false }) {
           name: firebaseUser.displayName || form.name,
           role: "student",
         };
+        
+        login({
+          token: idToken,
+          user: userFromBackend,
+        });
       }
-
-      login({
-        token: idToken,
-        user: userFromBackend,
-      });
     } catch (err) {
       showError("Authentication failed.");
       setError(getAuthError(err.code));
@@ -303,6 +310,13 @@ function AuthForm({ title, subtitle, button, showName = false }) {
           name: firebaseUser.displayName,
         });
         userData = res.data.data.user;
+        const sessionId = res.data.data.sessionId;
+        
+        login({
+          token: idToken,
+          user: userData,
+          sessionId: sessionId, // 🔥 IMPORTANT: Store sessionId
+        });
       } catch {
         userData = {
           uid: firebaseUser.uid,
@@ -310,12 +324,12 @@ function AuthForm({ title, subtitle, button, showName = false }) {
           name: firebaseUser.displayName,
           role: "student",
         };
+        
+        login({
+          token: idToken,
+          user: userData,
+        });
       }
-
-      login({
-        token: idToken,
-        user: userData,
-      });
       resyncUser();
     } catch (err) {
       setError(err.message || "Google login failed");

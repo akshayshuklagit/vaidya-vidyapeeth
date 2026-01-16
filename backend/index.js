@@ -22,6 +22,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import webhookRoutes from "./routes/webhookRoutes.js";
 import zoomRoutes from "./routes/zoomRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import blogRoutes from "./routes/blogRoutes.js";
 import errorHandler from "./middlewares/errorHandler.js";
 
 const app = express();
@@ -48,6 +49,7 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/zoom", zoomRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/blogs", blogRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Vaidya Vidyapeeth API is running!" });

@@ -4,6 +4,7 @@ import admin from "../config/firebaseAdmin.js";
 const authenticate = async (req, res, next) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
+    const sessionId = req.header("x-session-id");
 
     if (!token) {
       return res.status(401).json({
@@ -13,23 +14,33 @@ const authenticate = async (req, res, next) => {
     }
 
     const decodedToken = await admin.auth().verifyIdToken(token);
-    
+
     // Get user from database
-    const User = (await import('../models/User.js')).default;
+    const User = (await import("../models/User.js")).default;
     const user = await User.findOne({ uid: decodedToken.uid });
-    
+
     if (!user) {
       return res.status(401).json({
         success: false,
         error: "User not found",
       });
     }
-    
-    req.user = user; // Set full user object
-    req.userRole = user.role || 'student';
-    
+
+    // 🔐 SESSION VALIDATION
+    if (sessionId && user.sessionId && user.sessionId !== sessionId) {
+      return res.status(401).json({
+        success: false,
+        message: "SESSION_EXPIRED",
+        error: "Session expired - logged in from another device",
+      });
+    }
+
+    req.user = user;
+    req.userRole = user.role || "student";
+
     next();
   } catch (error) {
+    console.error("Auth error:", error);
     res.status(401).json({
       success: false,
       error: "Invalid token",
